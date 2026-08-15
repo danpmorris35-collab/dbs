@@ -195,6 +195,58 @@
         }
 
         /* --- Background Effects --- */
+
+        /* Leather grain: a coarse pebbled mottle under the fine grain. Two
+           different frequencies, because hide has structure at both scales —
+           one alone reads as digital noise. */
+        .leather {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.055;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E");
+            background-size: 300px 300px;
+        }
+
+        /* --- Blind emboss ------------------------------------------------
+           The wordmark struck into the hide. A recess, so the letterform is
+           DARKER than the surface, with light catching the lower wall and the
+           upper wall in shadow — the inverse of raised type. Get that backwards
+           and it floats on top as a grey smudge instead of sinking in. */
+        .emboss-mark {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: var(--serif);
+            font-weight: 300;
+            /* ~74% of the viewport: the die never runs off the hide */
+            font-size: min(14vw, 232px);
+            line-height: 1;
+            letter-spacing: 0.08em;
+            text-indent: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            /* Sits under the headline mass rather than straddling the gap
+               between headline and body copy, where thin italic has to fight it */
+            transform: translateY(-7%);
+            /* Alpha, not a fixed colour, so the recess tracks the vignette
+               instead of fighting it. Measured swing is ~12 levels of
+               luminance: present when the light moves, invisible otherwise. */
+            color: rgba(0, 0, 0, 0.10);
+            text-shadow:
+                0 2px 1px rgba(255, 255, 255, 0.03),
+                0 -1px 1px rgba(0, 0, 0, 0.28);
+            opacity: 0;
+            transition: opacity 2.6s ease 0.5s;
+        }
+        body.loaded .emboss-mark { opacity: 1; }
+
         .grain {
             position: fixed;
             inset: 0;
@@ -840,7 +892,7 @@
             .intro-monogram, .intro-wordmark, .intro-rule { opacity: 1; transform: none; }
             .intro-shine { display: none; }
             main { transform: none; }
-            .plate-frame { opacity: 1; }
+            .plate-frame, .emboss-mark { opacity: 1; }
             h1 em {
                 animation: none;
                 background-position: 30% 50%;
@@ -880,7 +932,7 @@
 
         @media print {
             #loader, .grain, .ambient-light, #access-modal, .plate-frame,
-            .lang-switch { display: none !important; }
+            .leather, .emboss-mark, .lang-switch { display: none !important; }
             body { background: #fff; color: #000; }
             main, footer { opacity: 1 !important; transform: none !important; }
             h1, h2, footer, .cta-note, .description { text-shadow: none !important; color: #000 !important; }
@@ -890,7 +942,7 @@
     <noscript>
         <style>
             #loader { display: none; }
-            main, footer, .plate-frame { opacity: 1 !important; transform: none !important; }
+            main, footer, .plate-frame, .emboss-mark { opacity: 1 !important; transform: none !important; }
             /* Without JS the drawer can't be toggled — show the form inline instead */
             #access-modal { position: static; opacity: 1; visibility: visible; background: none; backdrop-filter: none; }
             .modal-content { position: static; width: 100%; max-width: 560px; height: auto; max-height: none; margin: 0 auto 60px; transform: none; border: none; box-shadow: none; }
@@ -900,6 +952,8 @@
     </noscript>
 </head>
 <body>
+    <div class="leather" aria-hidden="true"></div>
+    <div class="emboss-mark" aria-hidden="true">Alcora</div>
     <div class="grain" aria-hidden="true"></div>
     <div class="ambient-light" aria-hidden="true"></div>
     <div class="plate-frame" aria-hidden="true"></div>
