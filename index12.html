@@ -77,6 +77,9 @@
             /* Stop iOS/Android from re-scaling type on orientation change */
             -webkit-text-size-adjust: 100%;
             text-size-adjust: 100%;
+            /* Belt and braces against a stray wide element (third-party widgets
+               included) making the whole page pannable sideways. */
+            overflow-x: clip;
         }
 
         body {
@@ -128,22 +131,8 @@
             flex-direction: column;
             align-items: center;
         }
-        /* Medallion the intro mark is struck into, matching the hero seal */
-        .intro-seal {
-            display: grid;
-            place-items: center;
-            width: clamp(112px, 30vw, 152px);
-            aspect-ratio: 1 / 1;
-            border-radius: 50%;
-            box-shadow:
-                inset 0 0 0 1px rgba(196, 168, 118, 0.16),
-                inset 0 1px 0 rgba(255, 255, 255, 0.04),
-                0 20px 50px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            animation: introReveal 1.2s cubic-bezier(0.25, 1, 0.4, 1) forwards;
-        }
         .intro-monogram {
-            width: 62%;
+            width: clamp(64px, 18vw, 96px);
             height: auto;
             aspect-ratio: 1 / 1;
             opacity: 0;
@@ -256,65 +245,6 @@
         }
         body.loaded .plate-frame { opacity: 1; }
 
-        /* --- Blind-embossed watermark ------------------------------------
-           Struck into the stock with no ink: it is only ever legible as a
-           change in the light, so it must stay within a few points of the
-           page colour. */
-        .watermark {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            display: grid;
-            place-items: center;
-            pointer-events: none;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: var(--serif);
-            font-weight: 300;
-            /* Sized so the whole word lands inside the plate — a wordmark cropped
-               mid-letter reads as an accident rather than a watermark. */
-            font-size: min(19vw, 300px);
-            line-height: 1;
-            letter-spacing: 0.09em;
-            text-indent: 0.09em;
-            text-transform: uppercase;
-            white-space: nowrap;
-            color: #161514;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 -1px 1px rgba(0, 0, 0, 0.9);
-            opacity: 0;
-            transition: opacity 3s ease 0.4s;
-        }
-        body.loaded .watermark { opacity: 1; }
-
-        /* --- Standing wordmark, top left --- */
-        .masthead {
-            position: fixed;
-            /* clear of the frame's corner tick */
-            top: calc(var(--frame-inset) + 26px + var(--safe-t));
-            left: calc(var(--gutter) + var(--safe-l));
-            z-index: 20;
-            font-size: clamp(9px, 2.2vw, 10px);
-            font-weight: 400;
-            letter-spacing: 0.5em;
-            text-indent: 0.5em;
-            text-transform: uppercase;
-            color: var(--text-faint);
-            text-shadow: var(--pressed);
-            opacity: 0;
-            transition: opacity 2s ease 0.5s;
-        }
-        body.loaded .masthead { opacity: 1; }
-        @media (max-width: 767px) {
-            .masthead {
-                top: calc(var(--frame-inset) + 18px + var(--safe-t));
-                left: calc(var(--frame-inset) + 16px + var(--safe-l));
-            }
-        }
-        /* Landscape phones: the masthead would crowd the seal */
-        @media (max-height: 560px) and (orientation: landscape) {
-            .masthead { display: none; }
-        }
-
         /* --- Page shell -------------------------------------------------
            Footer sits in normal flow at the end of a min-height column, so it
            can never overlap the hero on short screens, and it drops below the
@@ -345,42 +275,15 @@
         }
         body.loaded main { opacity: 1; transform: scale(1); }
 
-        /* --- Pressed seal ------------------------------------------------
-           The monogram sits in a struck medallion: inner hairline for the
-           die edge, a highlight on the upper rim, shadow pooling below. */
-        .hero-seal {
-            position: relative;
-            display: grid;
-            place-items: center;
-            width: clamp(92px, 19vw, 118px);
-            aspect-ratio: 1 / 1;
-            margin: 0 auto clamp(24px, 4.5vh, 38px);
-            border-radius: 50%;
-            background:
-                radial-gradient(circle at 50% 24%, rgba(196, 168, 118, 0.10) 0%, transparent 62%),
-                radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.5) 0%, transparent 60%);
-            box-shadow:
-                inset 0 0 0 1px rgba(196, 168, 118, 0.24),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-                0 16px 40px rgba(0, 0, 0, 0.45);
-        }
-        .hero-seal::before {
-            content: '';
-            position: absolute;
-            /* proportional to the seal so it tracks every breakpoint override */
-            width: 80%;
-            aspect-ratio: 1 / 1;
-            border-radius: 50%;
-            border: 1px solid rgba(196, 168, 118, 0.10);
-        }
+        /* Monogram stands on its own: a disc here renders as a grey halo on
+           OLED panels, where a black blur over near-black is still visible. */
         .hero-logo {
-            position: relative;
-            width: 46%;
+            width: clamp(50px, 13vw, 68px);
             height: auto;
             aspect-ratio: 1 / 1;
+            margin: 0 auto clamp(20px, 3.5vh, 32px);
             opacity: 0.96;
-            filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+            filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
         }
         .eyebrow {
             font-size: clamp(10px, 2.4vw, 11px);
@@ -573,12 +476,22 @@
         footer > * { flex: 1 1 auto; }
         @media (max-width: 599px) {
             footer { flex-direction: column; gap: 7px; line-height: 1.5; }
+            /* Phones: main is a centred flex column, so generous padding buys
+               nothing and costs the footer its place on the first screen. */
+            main {
+                padding-top: clamp(36px, 6vh, 60px);
+                padding-bottom: clamp(24px, 4vh, 40px);
+            }
+            h1 { margin-bottom: 14px; }
+            .description { margin-bottom: clamp(24px, 4vh, 34px); }
+            .cta-note { margin-top: 16px; }
         }
         /* Narrowest phones: tighten tracking so the locations line stays on one row */
         @media (max-width: 380px) {
-            footer { font-size: 8.5px; letter-spacing: 0.14em; }
-            .hero-seal { width: 74px; margin-bottom: 18px; }
-            .cta-note { margin-top: 14px; }
+            footer { font-size: 8.5px; letter-spacing: 0.14em; padding-top: 14px; padding-bottom: 16px; }
+            .cta-note { margin-top: 12px; }
+            .hero-logo { margin-bottom: 16px; }
+            .description { margin-bottom: 22px; }
         }
         @media (min-width: 600px) {
             footer > :first-child { text-align: left; }
@@ -681,25 +594,11 @@
             padding-top: 14px;
             margin-bottom: clamp(22px, 4vw, 30px);
         }
-        /* Same medallion as the hero, struck smaller */
-        .modal-seal {
-            position: relative;
-            display: grid;
-            place-items: center;
-            width: 62px;
-            aspect-ratio: 1 / 1;
-            margin-bottom: clamp(18px, 3.5vw, 26px);
-            border-radius: 50%;
-            background: radial-gradient(circle at 50% 24%, rgba(196, 168, 118, 0.09) 0%, transparent 62%);
-            box-shadow:
-                inset 0 0 0 1px rgba(196, 168, 118, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                0 8px 20px rgba(0, 0, 0, 0.4);
-        }
         .modal-logo {
-            width: 46%;
+            width: 38px;
             height: auto;
             aspect-ratio: 1 / 1;
+            margin-bottom: clamp(18px, 3.5vw, 26px);
             filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
         }
         .modal-content .meta-row {
@@ -895,7 +794,7 @@
                 padding-top: clamp(56px, 9vh, 86px);
                 padding-bottom: clamp(28px, 5vh, 48px);
             }
-            .hero-seal { width: 92px; margin-bottom: 22px; }
+            .hero-logo { margin-bottom: 20px; }
             .cta-note { margin-top: 16px; }
         }
 
@@ -903,13 +802,11 @@
            Vertical rhythm collapses so the CTA stays above the fold. */
         @media (max-height: 560px) and (orientation: landscape) {
             main { padding-top: 26px; padding-bottom: 18px; }
-            /* the seal is the single biggest vertical cost — strike it small */
-            .hero-seal { width: 56px; margin-bottom: 10px; }
+            .hero-logo { width: 40px; margin-bottom: 10px; }
             .eyebrow { margin-bottom: 10px; }
             h1 { font-size: clamp(30px, 5.6vw, 46px); margin-bottom: 10px; }
             .description { font-size: 15px; margin-bottom: 18px; max-width: 60ch; }
             .cta-note { margin-top: 12px; font-size: 8.5px; }
-            .watermark { font-size: min(30vh, 200px); }
             .btn { min-height: 46px; padding: 14px 34px; }
             footer { padding-bottom: 12px; }
             .modal-content { padding-top: calc(26px + var(--safe-t)); padding-bottom: calc(30px + var(--safe-b)); }
@@ -922,7 +819,7 @@
            vertical budget back to seal, headline, CTA. */
         @media (max-height: 430px) and (orientation: landscape) {
             main { padding-top: 18px; padding-bottom: 12px; }
-            .hero-seal { width: 40px; margin-bottom: 6px; }
+            .hero-logo { width: 34px; margin-bottom: 6px; }
             .eyebrow { font-size: 9px; margin-bottom: 6px; }
             main .eyebrow::before, main .eyebrow::after { max-width: 70px; }
             h1 { font-size: clamp(26px, 4.4vw, 34px); line-height: 1.05; margin-bottom: 6px; }
@@ -940,10 +837,10 @@
                 transition-duration: 0.001ms !important;
                 scroll-behavior: auto !important;
             }
-            .intro-monogram, .intro-wordmark, .intro-seal, .intro-rule { opacity: 1; transform: none; }
+            .intro-monogram, .intro-wordmark, .intro-rule { opacity: 1; transform: none; }
             .intro-shine { display: none; }
             main { transform: none; }
-            .watermark, .plate-frame, .masthead { opacity: 1; }
+            .plate-frame { opacity: 1; }
             h1 em {
                 animation: none;
                 background-position: 30% 50%;
@@ -956,33 +853,44 @@
             input { border-bottom-color: rgba(244, 242, 238, 0.7); }
         }
 
-        /* --- Language Switcher (Elfsight Website Translator) --- */
-        .elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a {
+        /* --- Language Switcher (Elfsight Website Translator) ---------------
+           The widget's own element is restyled by their script at runtime, so
+           positioning it directly does not hold — it drops back into normal
+           flow at the top of the page. Position a wrapper we own instead and
+           let their element lay out inside it. */
+        .lang-switch {
             position: fixed;
-            top: calc(var(--frame-inset) + 18px + var(--safe-t));
-            right: calc(var(--gutter) + var(--safe-r));
-            z-index: 20;
+            top: calc(var(--frame-inset) + 14px + var(--safe-t));
+            right: calc(var(--frame-inset) + 12px + var(--safe-r));
+            z-index: 30;
+            display: flex;
+            justify-content: flex-end;
+            /* never let a third-party widget widen the page */
+            max-width: calc(100vw - (2 * var(--frame-inset)) - 24px);
+            opacity: 0;
+            transition: opacity 1.6s ease 0.4s;
         }
-        @media (max-width: 767px) {
-            .elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a {
-                top: calc(var(--frame-inset) + 14px + var(--safe-t));
-                right: calc(var(--frame-inset) + 12px + var(--safe-r));
+        body.loaded .lang-switch { opacity: 1; }
+        @media (min-width: 768px) {
+            .lang-switch {
+                top: calc(var(--frame-inset) + 18px + var(--safe-t));
+                right: calc(var(--gutter) + var(--safe-r));
             }
         }
 
         @media print {
-            #loader, .grain, .ambient-light, #access-modal, .watermark, .plate-frame,
-            .elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a { display: none !important; }
+            #loader, .grain, .ambient-light, #access-modal, .plate-frame,
+            .lang-switch { display: none !important; }
             body { background: #fff; color: #000; }
-            main, footer, .masthead { opacity: 1 !important; transform: none !important; }
-            h1, h2, .masthead, footer, .cta-note, .description { text-shadow: none !important; color: #000 !important; }
+            main, footer { opacity: 1 !important; transform: none !important; }
+            h1, h2, footer, .cta-note, .description { text-shadow: none !important; color: #000 !important; }
             h1 em { -webkit-text-fill-color: #000; color: #000; background: none; filter: none; }
         }
     </style>
     <noscript>
         <style>
             #loader { display: none; }
-            main, footer, .watermark, .plate-frame, .masthead { opacity: 1 !important; transform: none !important; }
+            main, footer, .plate-frame { opacity: 1 !important; transform: none !important; }
             /* Without JS the drawer can't be toggled — show the form inline instead */
             #access-modal { position: static; opacity: 1; visibility: visible; background: none; backdrop-filter: none; }
             .modal-content { position: static; width: 100%; max-width: 560px; height: auto; max-height: none; margin: 0 auto 60px; transform: none; border: none; box-shadow: none; }
@@ -994,24 +902,22 @@
 <body>
     <div class="grain" aria-hidden="true"></div>
     <div class="ambient-light" aria-hidden="true"></div>
-    <div class="watermark" aria-hidden="true">Alcora</div>
     <div class="plate-frame" aria-hidden="true"></div>
-    <div class="masthead" aria-hidden="true">Alcora</div>
 
     <!-- Elfsight Website Translator | Untitled Website Translator -->
     <script src="https://elfsightcdn.com/platform.js" async></script>
-    <div class="elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a" data-elfsight-app-lazy></div>
+    <div class="lang-switch">
+        <div class="elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a" data-elfsight-app-lazy></div>
+    </div>
 
     <div id="loader" aria-hidden="true">
         <div class="intro-content">
-            <div class="intro-seal">
-                <svg class="intro-monogram" viewBox="0 0 100 100" role="img" aria-label="Alcora">
-                    <path class="intro-a-base" d="M 20 84 L 50 16 L 80 84" />
-                    <line class="intro-bar-base" x1="32" y1="56" x2="92" y2="56" />
-                    <path class="intro-shine" d="M 20 84 L 50 16 L 80 84" />
-                    <line class="intro-shine bar" x1="32" y1="56" x2="92" y2="56" />
-                </svg>
-            </div>
+            <svg class="intro-monogram" viewBox="0 0 100 100" role="img" aria-label="Alcora">
+                <path class="intro-a-base" d="M 20 84 L 50 16 L 80 84" />
+                <line class="intro-bar-base" x1="32" y1="56" x2="92" y2="56" />
+                <path class="intro-shine" d="M 20 84 L 50 16 L 80 84" />
+                <line class="intro-shine bar" x1="32" y1="56" x2="92" y2="56" />
+            </svg>
             <div class="intro-wordmark">Alcora</div>
             <div class="intro-rule"></div>
         </div>
@@ -1019,9 +925,7 @@
 
     <div class="page">
         <main>
-            <div class="hero-seal">
-                <img class="hero-logo" src="alcora-monogram.png" alt="" width="68" height="68" decoding="async" fetchpriority="high">
-            </div>
+            <img class="hero-logo" src="alcora-monogram.png" alt="" width="68" height="68" decoding="async" fetchpriority="high">
             <div class="eyebrow"><span>The Private Collection</span></div>
             <h1>Curating <em>Exceptional</em><br>New Homes.</h1>
             <p class="description">
@@ -1043,9 +947,7 @@
 
             <div id="form-panel">
                 <div class="modal-top">
-                    <div class="modal-seal">
-                        <img class="modal-logo" src="alcora-monogram.png" alt="" width="38" height="38" decoding="async" loading="lazy">
-                    </div>
+                    <img class="modal-logo" src="alcora-monogram.png" alt="" width="38" height="38" decoding="async" loading="lazy">
                     <div class="meta-row">
                         <div class="eyebrow">By Invitation Only</div>
                         <div class="ref-code" id="ref-code">REF. 0000</div>
