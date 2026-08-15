@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xml — North Point Creative
+  Upload to the ROOT of the site so it answers at:
+    https://northpointcreative.co.uk/sitemap.xml
+  Then submit that URL in Google Search Console and Bing Webmaster Tools.
+
+  This is a one-page site, so there is one URL. On-page anchors (#work,
+  #pricing, #contact) must NOT be listed — a sitemap lists pages, and
+  duplicate anchor entries are ignored at best and flagged at worst.
+
+  Update <lastmod> whenever the page content meaningfully changes.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://northpointcreative.co.uk/</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://northpointcreative.co.uk/og-image.png</image:loc>
+      <image:title>North Point Creative, a web design studio in Liverpool</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://northpointcreative.co.uk/img_drshrooms.webp</image:loc>
+      <image:title>Dr.Shrooms online store, designed by North Point Creative</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://northpointcreative.co.uk/img_kcm.webp</image:loc>
+      <image:title>Knife Crime Matters campaign site, designed by North Point Creative</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://northpointcreative.co.uk/img_btg.webp</image:loc>
+      <image:title>Beyond The Gate programme site, designed by North Point Creative</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://northpointcreative.co.uk/img_erc.webp</image:loc>
+      <image:title>Early Recovery Coaching site, designed by North Point Creative</image:title>
+    </image:image>
+  </url>
+</urlset>

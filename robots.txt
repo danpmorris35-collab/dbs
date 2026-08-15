@@ -1,0 +1,13 @@
+# robots.txt — North Point Creative
+# Upload this file to the ROOT of the site so it answers at:
+#   https://northpointcreative.co.uk/robots.txt
+
+# Everything on this site is open to every search engine.
+User-agent: *
+Allow: /
+
+# Assistant and answer-engine crawlers are deliberately left allowed too:
+# being quoted in an AI answer is now a real source of enquiries, and blocking
+# these crawlers only removes the studio from those answers.
+
+Sitemap: https://northpointcreative.co.uk/sitemap.xml
