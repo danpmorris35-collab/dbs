@@ -31,9 +31,12 @@ every single listing below.
 Business name:  North Point Creative
 Locality:       Liverpool, Merseyside
 Country:        United Kingdom
+Phone:          07345 672773
+WhatsApp:       https://wa.me/447345672773
 Email:          hello@northpointcreative.co.uk
 Website:        https://northpointcreative.co.uk
-Phone:          ← YOU NEED ONE. See below.
+Hours:          Monday to Friday, 9am–5pm (calls and messages)
+                Email answered seven days a week
 Category:       Website designer
 Description:    North Point Creative is a boutique web design studio in
                 Liverpool, building custom, hand-designed websites for
@@ -41,30 +44,48 @@ Description:    North Point Creative is a boutique web design studio in
                 within 24 hours, and every site is yours to own outright.
 ```
 
-### You need a phone number
+### The phone number: one format, everywhere
 
-This is the single biggest gap. Yell, Yelp, Thomson Local and Apple Business
-Connect all treat a phone number as mandatory or near-mandatory, and Google
-Business Profile verification frequently routes through a call. A website with
-no phone number also converts worse — a good share of local buyers will not
-fill in a form.
+`07345 672773` is now on the site — in the structured data, the Contact
+section and the footer — and in the international form `+44 7345 672773` where
+machines read it.
 
-You do not have to give out your personal mobile. Options, cheapest first:
+The rule from here is boring and it matters: **type it the same way every
+time.** `07345 672773`, with that single space. Not `07345672773`, not
+`+447345 672773`. Google matches businesses across the web on an exact
+name/address/phone string, so two formats across twenty listings reads as two
+half-corroborated businesses instead of one solid one.
 
-| Option | Cost | Notes |
-|---|---|---|
-| Google Voice / a second SIM | Free–£10/mo | Simple, but not a Liverpool number |
-| A `0151` VoIP number (e.g. bOnline, Vonage, 8x8) | ~£5–10/mo | **Recommended.** A local dialling code is a genuine trust and ranking signal for local searches |
-| An `0800` number | ~£10/mo | Reads as national, not local. Weaker for this |
+Two things worth knowing, neither urgent:
 
-Get a `0151` number. Then:
+- **A mobile is perfectly acceptable.** Google accepts mobile numbers for
+  service-area businesses and thousands of Liverpool sole traders list one.
+  It is a marginally weaker local signal than an `0151` landline, which is
+  read as tied to the city — if you ever want to close that gap, a `0151` VoIP
+  line runs about £5–10/mo (bOnline, Vonage, 8x8) and can forward to the same
+  handset. Not worth doing now; worth knowing later.
+- **This number is about to be public.** Expect cold sales calls, particularly
+  in the fortnight after the directory listings go live. That is the cost of
+  being findable, and it is worth paying — just do not be alarmed by it.
 
-1. Add it to the studio's structured data in `index.html` (there is a comment
-   marking the exact spot).
-2. Add it to the footer NAP block (also marked with a comment).
-3. Add it to the Contact section next to the email.
-4. Use that identical string everywhere below — `0151 XXX XXXX`, one format,
-   forever.
+### Get the WhatsApp Business app
+
+Your hours are 9–5 weekdays, but WhatsApp messages will arrive at 9pm on a
+Sunday. The free [WhatsApp Business](https://business.whatsapp.com) app
+(replaces the normal app on the same number) solves this properly:
+
+- **Away messages** that auto-reply outside your hours, so a Sunday enquiry
+  gets an immediate "thanks, I'll come back to you Monday morning" instead of
+  silence
+- **A greeting message** for first-time enquiries
+- **A business profile** showing your hours, address area, email and website
+  inside the chat itself — another consistent citation, and one prospects
+  actually look at
+- **Labels** to separate live enquiries from clients from suppliers
+- **Quick replies** — saved answers for "what does a website cost?", which is
+  the message you will get most
+
+Set the hours in the app to match everywhere else: Mon–Fri, 9am–5pm.
 
 ### And decide the address question
 
@@ -105,9 +126,10 @@ positions take the overwhelming majority of local clicks.
    something tying you to the business — a bank statement, an invoice, branded
    material. Takes five minutes; approval takes up to five working days. Have
    something branded to hand before you start recording.
-7. **Hours:** set real ones. "By appointment" is fine but set the hours you
-   will actually answer that new phone. Then put the same hours in the
-   `openingHoursSpecification` slot in the site's structured data.
+7. **Hours:** `Monday–Friday, 09:00–17:00`. Same as the site, same as the
+   WhatsApp Business app. Do not leave this blank — a profile with no hours
+   gets shown less in "open now" searches, which is a large share of mobile
+   local searches.
 8. **Services:** add each package — Basic Website £295, Standard £495,
    Premium £750, Care Plan £35/mo — with the descriptions from your price
    list. These show directly in the profile and are read as ranking signals.
@@ -245,7 +267,12 @@ pitched them. An empty page-one result is a bad first impression.
 Once each exists, add its URL to the `sameAs` array in the site's structured
 data (marked with a comment in `index.html`). That array is the line that tells
 Google "all of these profiles are this one business". It ties the whole thing
-together and it is currently empty.
+together and it is currently empty — **it is now the only thing still missing
+from the code.**
+
+While you are setting these up: put `wa.me/447345672773` in every bio field
+that allows a link, and the same `07345 672773` in every phone field. Instagram
+and Facebook both let you add a WhatsApp button to the profile directly.
 
 ---
 
@@ -329,8 +356,8 @@ test removing.
 
 | When | Do |
 |---|---|
-| **This week** | Get the `0151` number. Google Business Profile, submitted for verification. Search Console + sitemap submitted. Review requests sent to all four clients |
-| **Next week** | Bing Places, Bing Webmaster Tools, Apple Business Connect. Add the phone number and social URLs to `index.html` |
+| **This week** | Install WhatsApp Business and set the away message. Google Business Profile, submitted for verification. Search Console + sitemap submitted. Review requests sent to all four clients |
+| **Next week** | Bing Places, Bing Webmaster Tools, Apple Business Connect. Send me the social URLs for the `sameAs` array |
 | **Week 3** | Yell, FreeIndex, Yelp, Thomson Local, Cylex, Hotfrog, Scoot, 192.com — one sitting, same NAP block open in a second window |
 | **Week 4** | Clutch, DesignRush, Sortlist, Trustpilot. Facebook, Instagram, LinkedIn |
 | **Ongoing, monthly** | One Google Post. Check Search Console. Ask every finished client for a review and a footer credit |
@@ -363,15 +390,28 @@ All committed on this branch.
   covering the seven towns, `logo` as a proper `ImageObject`, `foundingDate`,
   `currenciesAccepted`, a `contactPoint`, and `url` + `availability` on every
   package offer
-- **Three slots left deliberately empty**, each marked with a comment giving the
-  exact instruction: `telephone`, `sameAs`, `openingHoursSpecification`. Wrong
-  data in those fields is worse than absent data, so I have not guessed at any
-  of them
+- **Phone, hours and WhatsApp added** — `telephone` in international form,
+  `openingHoursSpecification` for Mon–Fri 09:00–17:00, and three separate
+  `contactPoint` entries: the phone with its weekday hours, WhatsApp with its
+  `wa.me` link, and email marked as available all week
+- **One slot still deliberately empty**: `sameAs`, marked with a comment. It
+  needs real profile URLs and wrong data there is worse than absent data
 - **`geo.region` / `geo.placename` / `ICBM` meta tags** added — legacy, but
   still read by several of the directories in section 4
 - **A marked slot** for the Google and Bing verification meta tags
-- **Footer** now carries a machine-readable NAP block and a service-areas line,
-  so the towns you cover appear as crawlable text and not only inside the JSON
+- **Footer** now carries a machine-readable NAP block — name, locality, phone,
+  email, hours — plus a service-areas line, so the towns you cover appear as
+  crawlable text and not only inside the JSON
+- **Contact section** now lists Telephone and WhatsApp alongside Email, each
+  with its own hours underneath rather than in a separate row
+- **A WhatsApp button**, fixed bottom-right on every screen. Built in the
+  studio's own materials — a noir plate with a brass hairline, the glyph left
+  in WhatsApp's green so it is recognised instantly — rather than the usual
+  green bubble, which would have fought the page. It collapses to a circle on
+  phones, stays hidden until the loader lifts, and stands itself down over the
+  contact section, where the form is already asking for the same thing and
+  where on a phone it would sit on top of the submit button. Opens a chat with
+  a prefilled first message
 - The existing FAQ structured data was already correct and is untouched
 
 **New files** — these three go in the **root of the web host**, not just the
@@ -388,11 +428,9 @@ repo, or they do nothing:
 
 ## What I need from you to finish the code side
 
-1. The `0151` phone number, once you have it
-2. The URLs of your Google Business Profile, Yell, Facebook, Instagram and
+1. The URLs of your Google Business Profile, Yell, Facebook, Instagram and
    LinkedIn pages, once they exist — for the `sameAs` array
-3. Your real contactable hours
-4. Confirmation of where the site is hosted, so the three root files land in
-   the right place
+2. Confirmation of where the site is hosted, so `robots.txt`, `sitemap.xml`
+   and `site.webmanifest` land in the root and not just in the repo
 
-Send those over and the remaining slots get filled in a few minutes.
+Send those over and the last slot gets filled in a few minutes.

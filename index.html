@@ -56,16 +56,15 @@
 <meta name="twitter:image:alt" content="North Point Creative, a web design studio in Liverpool">
 
 <!-- Structured data.
-     THREE THINGS TO FILL IN once you have them — all are listed with exact
-     instructions in docs/get-found-online.md:
-       1. "telephone" — add it to the studio node below AND use the identical
-          number on every directory listing. Google matches businesses on an
-          exact name/address/phone string.
-       2. "sameAs" — the URLs of your Google Business Profile, Yell page,
-          Facebook, Instagram and LinkedIn. This is the line that tells Google
-          those listings and this website are the same business.
-       3. "openingHoursSpecification" — your real contactable hours.
-     Do not invent any of them: wrong data here is worse than absent data. -->
+     ONE THING STILL TO FILL IN — "sameAs", the URLs of the Google Business
+     Profile, Yell page, Facebook, Instagram and LinkedIn, once they exist.
+     That array is the line that tells Google those listings and this website
+     are the same business. Instructions in docs/get-found-online.md.
+
+     The phone number below (+44 7345 672773) must be written IDENTICALLY on
+     every directory listing — Google matches businesses on an exact
+     name/address/phone string, so "07345 672773" and "+44 7345 672773" in
+     different places weakens both. Pick one display format and never vary it. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -115,6 +114,15 @@
         "caption": "North Point Creative"
       },
       "email": "hello@northpointcreative.co.uk",
+      "telephone": "+44 7345 672773",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "17:00"
+        }
+      ],
       "priceRange": "££",
       "currenciesAccepted": "GBP",
       "foundingDate": "2026",
@@ -163,13 +171,43 @@
           { "@type": "Offer", "name": "Care Plan", "priceCurrency": "GBP", "price": "35", "url": "https://northpointcreative.co.uk/#pricing", "priceSpecification": { "@type": "UnitPriceSpecification", "priceCurrency": "GBP", "price": "35", "unitText": "MONTH" } }
         ]
       },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "sales",
-        "email": "hello@northpointcreative.co.uk",
-        "areaServed": "GB",
-        "availableLanguage": "en-GB"
-      }
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "contactType": "sales",
+          "telephone": "+44 7345 672773",
+          "areaServed": "GB",
+          "availableLanguage": "en-GB",
+          "hoursAvailable": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "09:00",
+            "closes": "17:00"
+          }
+        },
+        {
+          "@type": "ContactPoint",
+          "name": "WhatsApp",
+          "contactType": "sales",
+          "telephone": "+44 7345 672773",
+          "url": "https://wa.me/447345672773",
+          "areaServed": "GB",
+          "availableLanguage": "en-GB"
+        },
+        {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "email": "hello@northpointcreative.co.uk",
+          "areaServed": "GB",
+          "availableLanguage": "en-GB",
+          "hoursAvailable": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "opens": "00:00",
+            "closes": "23:59"
+          }
+        }
+      ]
     }
   ]
 }
@@ -1717,6 +1755,9 @@ nav {
 .contact-detail .cd-value { font-size: 18px; color: var(--ivory); font-family: var(--display); }
 .contact-detail .cd-value a { transition: color 0.3s; }
 .contact-detail .cd-value a:hover { color: var(--champagne); }
+/* when a channel has hours attached, they belong under it — not in a separate
+   row the reader has to hold in their head while looking at the number */
+.contact-detail .cd-note { margin-top: 7px; font-size: 13px; color: var(--ivory-dim); line-height: 1.5; }
 
 .contact-assurances { list-style: none; margin: 26px 0 0; padding: 26px 0 0; border-top: 1px solid var(--hair); display: flex; flex-direction: column; gap: 14px; }
 .contact-assurances li { font-size: 14px; color: var(--ivory-dim); line-height: 1.6; position: relative; padding-left: 22px; }
@@ -1844,6 +1885,7 @@ footer { background: var(--noir); color: var(--ivory); padding: 0 0 46px; border
 .footer-nap .fn-line { display: block; margin-bottom: 0; font-size: 14px; }
 .footer-nap a.fn-line { color: var(--ivory-soft); }
 .footer-nap a.fn-line:hover { color: var(--champagne); }
+.footer-nap .fn-hours { color: var(--ivory-dim); font-size: 13px; margin-top: 4px; }
 .footer-areas { font-size: 13px !important; color: rgba(249, 246, 240, 0.55) !important; }
 .footer-section a { color: var(--ivory-soft); font-size: 14px; display: block; margin-bottom: 12px; transition: color 0.3s; font-weight: 400; }
 .footer-section a:hover { color: var(--champagne); }
@@ -1853,6 +1895,47 @@ footer { background: var(--noir); color: var(--ivory); padding: 0 0 46px; border
   font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ivory-dim); font-weight: 500;
 }
 @media (max-width: 700px) { .footer-bottom { flex-direction: column; text-align: center; } }
+
+/* ============ WHATSAPP ============ */
+/* A live channel, sitting in the studio's own materials rather than the usual
+   green bubble: a noir plate with a brass hairline, the glyph kept in its own
+   green so it is recognised at a glance. It steps aside over the contact
+   section, where the form is already asking for the same thing. */
+.wa-fab {
+  position: fixed; z-index: 2500;
+  right: clamp(16px, 3vw, 34px);
+  bottom: calc(clamp(16px, 3vw, 34px) + env(safe-area-inset-bottom, 0px));
+  display: inline-flex; align-items: center; gap: 11px;
+  padding: 14px 22px 14px 18px;
+  background: var(--noir-2); color: var(--ivory);
+  border: 1px solid var(--brass-soft);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease),
+              border-color 0.35s var(--ease), background 0.35s var(--ease), visibility 0s linear 0s;
+}
+.wa-fab:hover { background: var(--noir-3); border-color: var(--champagne); }
+.wa-fab .wa-glyph { width: 20px; height: 20px; flex-shrink: 0; fill: #25D366; }
+.wa-fab .wa-sub {
+  display: block; font-size: 9px; font-weight: 500; letter-spacing: 0.18em;
+  color: var(--ivory-dim); margin-top: 3px; text-transform: uppercase;
+}
+/* hidden until the loader has lifted, and while the contact form is on screen */
+body.loading .wa-fab,
+.wa-fab.is-stood-down {
+  opacity: 0; transform: translateY(14px) scale(0.96); visibility: hidden;
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), visibility 0s linear 0.35s;
+}
+@media (max-width: 640px) {
+  /* on a phone the label is a luxury the screen cannot afford: glyph only */
+  .wa-fab { padding: 0; width: 54px; height: 54px; justify-content: center; gap: 0; border-radius: 50%; }
+  .wa-fab .wa-text { display: none; }
+  .wa-fab .wa-glyph { width: 24px; height: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wa-fab { transition: none; }
+  body.loading .wa-fab, .wa-fab.is-stood-down { transform: none; transition: none; }
+}
 
 /* ============ REVEAL ============ */
 /* one reveal, and a stagger taken from the item's own index in its row.
@@ -2598,10 +2681,17 @@ body.loading .cover-deck{animation-play-state:running!important}</style></noscri
         <div class="contact-detail">
           <div class="cd-label">Email</div>
           <div class="cd-value"><a href="mailto:hello@northpointcreative.co.uk">hello@northpointcreative.co.uk</a></div>
+          <div class="cd-note">Answered seven days a week</div>
         </div>
         <div class="contact-detail">
-          <div class="cd-label">Website</div>
-          <div class="cd-value"><a href="https://northpointcreative.co.uk" target="_blank" rel="noopener">northpointcreative.co.uk</a></div>
+          <div class="cd-label">Telephone</div>
+          <div class="cd-value"><a href="tel:+447345672773">07345 672773</a></div>
+          <div class="cd-note">Monday to Friday, 9am&ndash;5pm</div>
+        </div>
+        <div class="contact-detail">
+          <div class="cd-label">WhatsApp</div>
+          <div class="cd-value"><a href="https://wa.me/447345672773?text=Hi%20North%20Point%2C%20I%27d%20like%20a%20quote%20for%20a%20website." target="_blank" rel="noopener">Message the studio</a></div>
+          <div class="cd-note">Send a voice note or photos of what you have</div>
         </div>
         <div class="contact-detail">
           <div class="cd-label">Response Time</div>
@@ -2675,6 +2765,15 @@ body.loading .cover-deck{animation-play-state:running!important}</style></noscri
 </section>
 </main>
 
+<!-- WHATSAPP -->
+<a class="wa-fab" id="waFab"
+   href="https://wa.me/447345672773?text=Hi%20North%20Point%2C%20I%27d%20like%20a%20quote%20for%20a%20website."
+   target="_blank" rel="noopener"
+   aria-label="Message North Point Creative on WhatsApp">
+  <svg class="wa-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+  <span class="wa-text">WhatsApp<span class="wa-sub">Mon&ndash;Fri, 9&ndash;5</span></span>
+</a>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-brand">
@@ -2690,9 +2789,9 @@ body.loading .cover-deck{animation-play-state:running!important}</style></noscri
         <p class="footer-nap">
           <span class="fn-name">North Point Creative</span>
           <span class="fn-line">Liverpool, Merseyside, United Kingdom</span>
+          <a class="fn-line" href="tel:+447345672773">07345 672773</a>
           <a class="fn-line" href="mailto:hello@northpointcreative.co.uk">hello@northpointcreative.co.uk</a>
-          <!-- Add your phone number here as a plain tel: link once you have a
-               business number. It must match your directory listings exactly. -->
+          <span class="fn-line fn-hours">Calls Mon&ndash;Fri, 9am&ndash;5pm &middot; Email answered daily</span>
         </p>
         <p class="footer-areas">Working with businesses in Liverpool, Wirral, St Helens, Warrington, Southport, Chester and Manchester &mdash; and remotely across the whole of the UK.</p>
       </div>
@@ -2709,6 +2808,8 @@ body.loading .cover-deck{animation-play-state:running!important}</style></noscri
       <div class="footer-section">
         <h4>Enquiries</h4>
         <a href="mailto:hello@northpointcreative.co.uk">hello@northpointcreative.co.uk</a>
+        <a href="tel:+447345672773">07345 672773</a>
+        <a href="https://wa.me/447345672773?text=Hi%20North%20Point%2C%20I%27d%20like%20a%20quote%20for%20a%20website." target="_blank" rel="noopener">Message on WhatsApp</a>
         <p>Reply within 24 hours</p>
       </div>
     </div>
@@ -3032,6 +3133,20 @@ function handleSubmit(event) {
   });
 })();
 
+/* ===== WhatsApp: stands down over the contact form =====
+   The form is already asking for the enquiry there, and on a phone the button
+   sits exactly where the submit button is. Everywhere else it stays put. */
+(function () {
+  var fab = document.getElementById('waFab');
+  var contact = document.getElementById('contact');
+  if (!fab || !contact || !('IntersectionObserver' in window)) return;
+
+  new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      fab.classList.toggle('is-stood-down', e.isIntersecting);
+    });
+  }, { rootMargin: '-25% 0px -25% 0px' }).observe(contact);
+})();
 
 </script>
 
