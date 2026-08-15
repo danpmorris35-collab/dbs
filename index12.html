@@ -47,10 +47,23 @@
             --text-faint: #737069;
             --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
             --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            --foil: linear-gradient(115deg, #9C7F4E 0%, #E8CFA0 22%, #C4A876 42%, #F5E4C0 58%, #9C7F4E 78%, #C4A876 100%);
+            --foil: linear-gradient(115deg, #8A6E42 0%, #E8CFA0 18%, #C4A876 34%, #FBF0D6 50%, #C4A876 64%, #8A6E42 82%, #D8B984 100%);
+            --rule: rgba(196, 168, 118, 0.22);
+            --rule-soft: rgba(196, 168, 118, 0.12);
+
+            /* --- Relief system -------------------------------------------
+               One light source, high and slightly forward. Raised elements
+               catch it on their top edge and cast below; pressed elements do
+               the exact opposite. Every emboss on the page uses these two. */
+            --lift-hi: rgba(255, 255, 255, 0.07);
+            --lift-lo: rgba(0, 0, 0, 0.9);
+            --raised: 0 -1px 0 var(--lift-hi), 0 1px 0 var(--lift-lo), 0 2px 3px rgba(0, 0, 0, 0.55), 0 10px 28px rgba(0, 0, 0, 0.3);
+            --pressed: 0 1px 0 var(--lift-hi), 0 -1px 1px var(--lift-lo);
 
             /* Fluid gutter: never cramped on mobile, never over-wide on desktop */
             --gutter: clamp(22px, 5vw, 80px);
+            /* How far the engraved plate frame sits in from the viewport edge */
+            --frame-inset: clamp(10px, 2.2vw, 26px);
             /* Safe-area insets (notches, home indicators, curved corners) */
             --safe-t: env(safe-area-inset-top, 0px);
             --safe-r: env(safe-area-inset-right, 0px);
@@ -68,6 +81,12 @@
 
         body {
             background-color: var(--bg-dark);
+            /* Vignette: the page darkens toward the edges like stock lit from
+               above, which is what makes the relief below read as physical. */
+            background-image:
+                radial-gradient(120% 80% at 50% -10%, rgba(196, 168, 118, 0.055) 0%, transparent 60%),
+                radial-gradient(100% 100% at 50% 45%, rgba(28, 27, 25, 0.9) 0%, rgba(9, 9, 8, 0.95) 100%);
+            background-attachment: fixed;
             color: var(--text-light);
             font-family: var(--sans);
             font-weight: 300;
@@ -109,8 +128,22 @@
             flex-direction: column;
             align-items: center;
         }
+        /* Medallion the intro mark is struck into, matching the hero seal */
+        .intro-seal {
+            display: grid;
+            place-items: center;
+            width: clamp(112px, 30vw, 152px);
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            box-shadow:
+                inset 0 0 0 1px rgba(196, 168, 118, 0.16),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04),
+                0 20px 50px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            animation: introReveal 1.2s cubic-bezier(0.25, 1, 0.4, 1) forwards;
+        }
         .intro-monogram {
-            width: clamp(64px, 18vw, 96px);
+            width: 62%;
             height: auto;
             aspect-ratio: 1 / 1;
             opacity: 0;
@@ -152,9 +185,20 @@
             text-indent: 0.42em;
             text-transform: uppercase;
             color: var(--text-light);
+            text-shadow: var(--raised);
             opacity: 0;
             animation: wordFadeIn 1s ease forwards;
             animation-delay: 1.7s;
+        }
+        .intro-rule {
+            width: clamp(80px, 22vw, 140px);
+            height: 1px;
+            margin-top: 20px;
+            background: linear-gradient(90deg, transparent, var(--rule), transparent);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            animation: wordFadeIn 1.2s ease forwards;
+            animation-delay: 2s;
         }
         @keyframes wordFadeIn {
             0% { opacity: 0; transform: translateY(6px); }
@@ -179,6 +223,96 @@
             background: radial-gradient(circle, rgba(196, 168, 118, 0.05) 0%, transparent 70%);
             z-index: 0;
             pointer-events: none;
+        }
+
+        /* --- Engraved plate frame ---------------------------------------
+           Corner rules only, the way an engraved invitation is registered on
+           the plate — the eye completes the border without the border being
+           there to crowd small screens. */
+        .plate-frame {
+            position: fixed;
+            inset: var(--frame-inset);
+            z-index: 1;
+            pointer-events: none;
+            --tick: clamp(18px, 3.5vw, 34px);
+            background-image:
+                linear-gradient(var(--rule), var(--rule)), linear-gradient(var(--rule), var(--rule)),
+                linear-gradient(var(--rule), var(--rule)), linear-gradient(var(--rule), var(--rule)),
+                linear-gradient(var(--rule), var(--rule)), linear-gradient(var(--rule), var(--rule)),
+                linear-gradient(var(--rule), var(--rule)), linear-gradient(var(--rule), var(--rule));
+            background-repeat: no-repeat;
+            background-size:
+                var(--tick) 1px, 1px var(--tick),
+                var(--tick) 1px, 1px var(--tick),
+                var(--tick) 1px, 1px var(--tick),
+                var(--tick) 1px, 1px var(--tick);
+            background-position:
+                left top, left top,
+                right top, right top,
+                left bottom, left bottom,
+                right bottom, right bottom;
+            opacity: 0;
+            transition: opacity 2.4s ease 0.6s;
+        }
+        body.loaded .plate-frame { opacity: 1; }
+
+        /* --- Blind-embossed watermark ------------------------------------
+           Struck into the stock with no ink: it is only ever legible as a
+           change in the light, so it must stay within a few points of the
+           page colour. */
+        .watermark {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: var(--serif);
+            font-weight: 300;
+            /* Sized so the whole word lands inside the plate — a wordmark cropped
+               mid-letter reads as an accident rather than a watermark. */
+            font-size: min(19vw, 300px);
+            line-height: 1;
+            letter-spacing: 0.09em;
+            text-indent: 0.09em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            color: #161514;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 -1px 1px rgba(0, 0, 0, 0.9);
+            opacity: 0;
+            transition: opacity 3s ease 0.4s;
+        }
+        body.loaded .watermark { opacity: 1; }
+
+        /* --- Standing wordmark, top left --- */
+        .masthead {
+            position: fixed;
+            /* clear of the frame's corner tick */
+            top: calc(var(--frame-inset) + 26px + var(--safe-t));
+            left: calc(var(--gutter) + var(--safe-l));
+            z-index: 20;
+            font-size: clamp(9px, 2.2vw, 10px);
+            font-weight: 400;
+            letter-spacing: 0.5em;
+            text-indent: 0.5em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            text-shadow: var(--pressed);
+            opacity: 0;
+            transition: opacity 2s ease 0.5s;
+        }
+        body.loaded .masthead { opacity: 1; }
+        @media (max-width: 767px) {
+            .masthead {
+                top: calc(var(--frame-inset) + 18px + var(--safe-t));
+                left: calc(var(--frame-inset) + 16px + var(--safe-l));
+            }
+        }
+        /* Landscape phones: the masthead would crowd the seal */
+        @media (max-height: 560px) and (orientation: landscape) {
+            .masthead { display: none; }
         }
 
         /* --- Page shell -------------------------------------------------
@@ -211,12 +345,42 @@
         }
         body.loaded main { opacity: 1; transform: scale(1); }
 
+        /* --- Pressed seal ------------------------------------------------
+           The monogram sits in a struck medallion: inner hairline for the
+           die edge, a highlight on the upper rim, shadow pooling below. */
+        .hero-seal {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: clamp(92px, 19vw, 118px);
+            aspect-ratio: 1 / 1;
+            margin: 0 auto clamp(24px, 4.5vh, 38px);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 50% 24%, rgba(196, 168, 118, 0.10) 0%, transparent 62%),
+                radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.5) 0%, transparent 60%);
+            box-shadow:
+                inset 0 0 0 1px rgba(196, 168, 118, 0.24),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+                0 16px 40px rgba(0, 0, 0, 0.45);
+        }
+        .hero-seal::before {
+            content: '';
+            position: absolute;
+            /* proportional to the seal so it tracks every breakpoint override */
+            width: 80%;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            border: 1px solid rgba(196, 168, 118, 0.10);
+        }
         .hero-logo {
-            width: clamp(52px, 12vw, 68px);
+            position: relative;
+            width: 46%;
             height: auto;
             aspect-ratio: 1 / 1;
-            margin: 0 auto clamp(22px, 4.5vh, 34px);
             opacity: 0.96;
+            filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
         }
         .eyebrow {
             font-size: clamp(10px, 2.4vw, 11px);
@@ -224,17 +388,41 @@
             text-indent: 0.4em;
             text-transform: uppercase;
             color: var(--accent);
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8), 0 -1px 0 rgba(255, 255, 255, 0.05);
             margin-bottom: clamp(18px, 3.5vh, 30px);
         }
+        /* Eyebrow flanked by engraved hairlines that fade out from the type */
+        main .eyebrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(14px, 3vw, 22px);
+            width: 100%;
+            max-width: 520px;
+        }
+        main .eyebrow::before,
+        main .eyebrow::after {
+            content: '';
+            flex: 1 1 auto;
+            max-width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--rule));
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.025);
+        }
+        main .eyebrow::after { background: linear-gradient(90deg, var(--rule), transparent); }
         h1 {
             font-family: var(--serif);
             /* min raised so the headline still has presence on a 320px screen */
             font-size: clamp(42px, 9vw, 90px);
             font-weight: 300;
             line-height: 1.08;
+            letter-spacing: -0.005em;
             margin-bottom: clamp(16px, 3vh, 24px);
             max-width: 16ch;
             text-wrap: balance;
+            /* Struck type: a hairline of light on the upper edge, the body of
+               the shadow falling below and away. */
+            text-shadow: var(--raised);
         }
         h1 em {
             font-style: italic;
@@ -242,10 +430,17 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            background-size: 200% auto;
-            animation: foilMove 5s linear infinite;
+            background-size: 220% auto;
+            /* text-shadow would print straight through knocked-out type;
+               drop-shadow follows the glyph alpha, so the foil keeps its edge */
+            text-shadow: none;
+            filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.75)) drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
+            animation: foilMove 9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
         }
-        @keyframes foilMove { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        @keyframes foilMove {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 220% 50%; }
+        }
 
         .description {
             font-family: var(--serif);
@@ -254,8 +449,9 @@
             color: var(--text-muted);
             max-width: 34ch;
             margin-bottom: clamp(30px, 6vh, 50px);
-            line-height: 1.55;
+            line-height: 1.62;
             text-wrap: pretty;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
         }
         @media (min-width: 600px) { .description { max-width: 46ch; } }
 
@@ -269,8 +465,14 @@
             justify-content: center;
             min-height: 52px;
             padding: 18px clamp(32px, 8vw, 45px);
-            background: transparent;
-            border: 1px solid var(--accent);
+            /* Struck plate: lit along the top edge, seated in its own shadow */
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.22));
+            border: 1px solid rgba(196, 168, 118, 0.55);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.07),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+                0 14px 34px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.65);
             color: var(--text-light);
             font-family: var(--sans);
             font-weight: 400;
@@ -283,25 +485,55 @@
             overflow: hidden;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
-            transition: color 0.5s ease, border-color 0.5s ease, transform 0.2s ease;
+            transition: color 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease,
+                        text-shadow 0.6s ease, transform 0.2s ease;
         }
+        /* The foil wipe */
         .btn::before {
             content: '';
             position: absolute;
             top: 0; left: -100%;
             width: 100%; height: 100%;
-            background: var(--accent);
-            transition: left 0.5s ease;
+            background: var(--foil);
+            background-size: 200% auto;
+            transition: left 0.75s cubic-bezier(0.25, 1, 0.4, 1);
             z-index: -1;
+        }
+        /* Inner hairline: the second rule of an engraved plate */
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(196, 168, 118, 0.16);
+            pointer-events: none;
+            transition: border-color 0.6s ease;
         }
         /* Hover treatments only where a real pointer exists — on touch they
            stick after tap and read as a broken state. */
         @media (hover: hover) and (pointer: fine) {
-            .btn:hover { color: var(--bg-dark); }
+            .btn:hover {
+                color: #17140F;
+                border-color: var(--accent-bright);
+                /* label presses into the foil once the plate is filled */
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 18px 40px rgba(0, 0, 0, 0.45);
+            }
             .btn:hover::before { left: 0; }
+            .btn:hover::after { border-color: rgba(23, 20, 15, 0.18); }
         }
         .btn:active { transform: scale(0.985); }
         .btn:focus-visible { border-color: var(--accent-bright); }
+
+        /* Line of small caps beneath the CTA */
+        .cta-note {
+            margin-top: clamp(18px, 3vh, 26px);
+            font-size: clamp(9px, 2.2vw, 10px);
+            letter-spacing: 0.3em;
+            text-indent: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            text-shadow: var(--pressed);
+        }
 
         /* On phones the CTA spans the column so it is unmissable and easy to hit */
         .hero-cta { width: 100%; max-width: 420px; }
@@ -309,20 +541,33 @@
 
         /* --- Footer --- */
         footer {
+            position: relative;
             flex: 0 0 auto;
             display: flex;
             flex-wrap: wrap;
             gap: 10px 24px;
             justify-content: space-between;
             align-items: center;
-            padding: 0 calc(var(--gutter) + var(--safe-r)) clamp(22px, 4vh, 40px) calc(var(--gutter) + var(--safe-l));
+            padding: clamp(18px, 3vh, 28px) calc(var(--gutter) + var(--safe-r)) clamp(22px, 4vh, 40px) calc(var(--gutter) + var(--safe-l));
             font-size: clamp(9px, 2.2vw, 10px);
             letter-spacing: 0.2em;
             text-transform: uppercase;
             color: var(--text-faint);
             text-align: center;
+            text-shadow: var(--pressed);
             opacity: 0;
             transition: opacity 1.6s ease 0.2s;
+        }
+        /* Engraved rule above the imprint */
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: calc(var(--gutter) + var(--safe-l));
+            right: calc(var(--gutter) + var(--safe-r));
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--rule-soft) 22%, var(--rule-soft) 78%, transparent);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02);
         }
         body.loaded footer { opacity: 1; }
         footer > * { flex: 1 1 auto; }
@@ -332,6 +577,8 @@
         /* Narrowest phones: tighten tracking so the locations line stays on one row */
         @media (max-width: 380px) {
             footer { font-size: 8.5px; letter-spacing: 0.14em; }
+            .hero-seal { width: 74px; margin-bottom: 18px; }
+            .cta-note { margin-top: 14px; }
         }
         @media (min-width: 600px) {
             footer > :first-child { text-align: left; }
@@ -366,9 +613,13 @@
             -webkit-overflow-scrolling: touch;
             padding: calc(46px + var(--safe-t)) clamp(24px, 6vw, 48px) calc(60px + var(--safe-b));
             text-align: left;
-            background: linear-gradient(165deg, rgba(196, 168, 118, 0.06), transparent 50%), var(--bg-dark);
-            border-left: 1px solid rgba(196, 168, 118, 0.22);
-            box-shadow: -60px 0 120px rgba(0, 0, 0, 0.45);
+            background:
+                radial-gradient(120% 60% at 50% 0%, rgba(196, 168, 118, 0.075) 0%, transparent 55%),
+                linear-gradient(180deg, #161514 0%, #101010 100%);
+            border-left: 1px solid rgba(196, 168, 118, 0.28);
+            box-shadow:
+                inset 1px 0 0 rgba(255, 255, 255, 0.04),
+                -60px 0 120px rgba(0, 0, 0, 0.55);
             transform: translateX(100%);
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.4, 1);
         }
@@ -380,9 +631,10 @@
             left: clamp(24px, 6vw, 48px);
             right: clamp(24px, 6vw, 48px);
             height: 1px;
-            background: var(--accent);
-            opacity: 0.6;
-            box-shadow: 0 4px 0 rgba(196, 168, 118, 0.25);
+            /* double rule: heavy line with a fine companion, as engraved */
+            background: linear-gradient(90deg, rgba(196, 168, 118, 0.35), var(--accent) 30%, var(--accent) 70%, rgba(196, 168, 118, 0.35));
+            opacity: 0.65;
+            box-shadow: 0 4px 0 rgba(196, 168, 118, 0.22), 0 1px 0 rgba(0, 0, 0, 0.8);
         }
 
         /* Phones: bottom sheet — thumb-reachable, and it never covers the whole
@@ -429,11 +681,26 @@
             padding-top: 14px;
             margin-bottom: clamp(22px, 4vw, 30px);
         }
-        .modal-logo {
-            width: 38px;
-            height: auto;
+        /* Same medallion as the hero, struck smaller */
+        .modal-seal {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 62px;
             aspect-ratio: 1 / 1;
             margin-bottom: clamp(18px, 3.5vw, 26px);
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 24%, rgba(196, 168, 118, 0.09) 0%, transparent 62%);
+            box-shadow:
+                inset 0 0 0 1px rgba(196, 168, 118, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .modal-logo {
+            width: 46%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
         }
         .modal-content .meta-row {
             display: flex;
@@ -450,6 +717,15 @@
             color: var(--text-faint);
             white-space: nowrap;
         }
+        /* Reference struck into a small plate of its own */
+        #form-panel .ref-code {
+            padding: 5px 10px 4px;
+            border: 1px solid rgba(196, 168, 118, 0.28);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.2));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 6px rgba(0, 0, 0, 0.4);
+            color: var(--accent);
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+        }
         .modal-content h2 {
             font-family: var(--serif);
             font-weight: 300;
@@ -457,6 +733,7 @@
             line-height: 1.15;
             margin-bottom: clamp(16px, 3vw, 22px);
             color: var(--text-light);
+            text-shadow: var(--raised);
         }
         .modal-content p {
             font-family: var(--serif);
@@ -475,7 +752,9 @@
             width: 100%;
             background: transparent;
             border: none;
-            border-bottom: 1px solid rgba(145, 141, 133, 0.5);
+            /* the baseline is a groove: dark line, light edge catching below */
+            border-bottom: 1px solid rgba(196, 168, 118, 0.22);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.035);
             border-radius: 0;
             padding: 12px 0 9px;
             color: var(--text-light);
@@ -488,7 +767,7 @@
             -webkit-appearance: none;
             transition: border-color 0.4s ease;
         }
-        input:focus { outline: none; border-color: var(--accent); }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 1px 0 rgba(196, 168, 118, 0.18); }
         input:focus-visible { outline: none; }
         /* :user-invalid only fires after the field has been interacted with */
         input:user-invalid { border-color: #C87B6B; }
@@ -609,21 +888,48 @@
             .description { font-size: 26px; }
         }
 
+        /* Short laptops and landscape tablets (1366x768 and friends): pull the
+           vertical rhythm in so the imprint still lands on the first screen. */
+        @media (min-width: 600px) and (max-height: 850px) {
+            main {
+                padding-top: clamp(56px, 9vh, 86px);
+                padding-bottom: clamp(28px, 5vh, 48px);
+            }
+            .hero-seal { width: 92px; margin-bottom: 22px; }
+            .cta-note { margin-top: 16px; }
+        }
+
         /* --- Landscape phones and other short viewports ---
            Vertical rhythm collapses so the CTA stays above the fold. */
         @media (max-height: 560px) and (orientation: landscape) {
-            .page { min-height: auto; }
-            main { padding-top: 34px; padding-bottom: 20px; }
-            .hero-logo { width: 42px; margin-bottom: 14px; }
-            .eyebrow { margin-bottom: 12px; }
-            h1 { font-size: clamp(30px, 5.6vw, 46px); margin-bottom: 12px; }
-            .description { font-size: 15px; margin-bottom: 22px; max-width: 60ch; }
+            main { padding-top: 26px; padding-bottom: 18px; }
+            /* the seal is the single biggest vertical cost — strike it small */
+            .hero-seal { width: 56px; margin-bottom: 10px; }
+            .eyebrow { margin-bottom: 10px; }
+            h1 { font-size: clamp(30px, 5.6vw, 46px); margin-bottom: 10px; }
+            .description { font-size: 15px; margin-bottom: 18px; max-width: 60ch; }
+            .cta-note { margin-top: 12px; font-size: 8.5px; }
+            .watermark { font-size: min(30vh, 200px); }
             .btn { min-height: 46px; padding: 14px 34px; }
             footer { padding-bottom: 12px; }
             .modal-content { padding-top: calc(26px + var(--safe-t)); padding-bottom: calc(30px + var(--safe-b)); }
             .modal-content::before { top: calc(26px + var(--safe-t)); }
             .modal-top { padding-top: 6px; margin-bottom: 18px; }
             .modal-logo { width: 30px; margin-bottom: 14px; }
+        }
+
+        /* Very short landscape (older handsets, split-screen): strip the
+           vertical budget back to seal, headline, CTA. */
+        @media (max-height: 430px) and (orientation: landscape) {
+            main { padding-top: 18px; padding-bottom: 12px; }
+            .hero-seal { width: 40px; margin-bottom: 6px; }
+            .eyebrow { font-size: 9px; margin-bottom: 6px; }
+            main .eyebrow::before, main .eyebrow::after { max-width: 70px; }
+            h1 { font-size: clamp(26px, 4.4vw, 34px); line-height: 1.05; margin-bottom: 6px; }
+            .description { font-size: 13.5px; line-height: 1.45; margin-bottom: 12px; }
+            .btn { min-height: 42px; padding: 12px 28px; }
+            .cta-note { display: none; }
+            footer { padding-top: 10px; padding-bottom: 8px; }
         }
 
         /* --- Motion / accessibility preferences --- */
@@ -634,9 +940,10 @@
                 transition-duration: 0.001ms !important;
                 scroll-behavior: auto !important;
             }
-            .intro-monogram, .intro-wordmark { opacity: 1; transform: none; }
+            .intro-monogram, .intro-wordmark, .intro-seal, .intro-rule { opacity: 1; transform: none; }
             .intro-shine { display: none; }
             main { transform: none; }
+            .watermark, .plate-frame, .masthead { opacity: 1; }
             h1 em {
                 animation: none;
                 background-position: 30% 50%;
@@ -652,29 +959,30 @@
         /* --- Language Switcher (Elfsight Website Translator) --- */
         .elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a {
             position: fixed;
-            top: calc(20px + var(--safe-t));
+            top: calc(var(--frame-inset) + 18px + var(--safe-t));
             right: calc(var(--gutter) + var(--safe-r));
             z-index: 20;
         }
         @media (max-width: 767px) {
             .elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a {
-                top: calc(12px + var(--safe-t));
-                right: calc(12px + var(--safe-r));
+                top: calc(var(--frame-inset) + 14px + var(--safe-t));
+                right: calc(var(--frame-inset) + 12px + var(--safe-r));
             }
         }
 
         @media print {
-            #loader, .grain, .ambient-light, #access-modal,
+            #loader, .grain, .ambient-light, #access-modal, .watermark, .plate-frame,
             .elfsight-app-2102d2c6-bfdb-4348-9185-164c8854140a { display: none !important; }
             body { background: #fff; color: #000; }
-            main { opacity: 1 !important; transform: none !important; }
-            h1 em { -webkit-text-fill-color: #000; color: #000; background: none; }
+            main, footer, .masthead { opacity: 1 !important; transform: none !important; }
+            h1, h2, .masthead, footer, .cta-note, .description { text-shadow: none !important; color: #000 !important; }
+            h1 em { -webkit-text-fill-color: #000; color: #000; background: none; filter: none; }
         }
     </style>
     <noscript>
         <style>
             #loader { display: none; }
-            main, footer { opacity: 1 !important; transform: none !important; }
+            main, footer, .watermark, .plate-frame, .masthead { opacity: 1 !important; transform: none !important; }
             /* Without JS the drawer can't be toggled — show the form inline instead */
             #access-modal { position: static; opacity: 1; visibility: visible; background: none; backdrop-filter: none; }
             .modal-content { position: static; width: 100%; max-width: 560px; height: auto; max-height: none; margin: 0 auto 60px; transform: none; border: none; box-shadow: none; }
@@ -686,6 +994,9 @@
 <body>
     <div class="grain" aria-hidden="true"></div>
     <div class="ambient-light" aria-hidden="true"></div>
+    <div class="watermark" aria-hidden="true">Alcora</div>
+    <div class="plate-frame" aria-hidden="true"></div>
+    <div class="masthead" aria-hidden="true">Alcora</div>
 
     <!-- Elfsight Website Translator | Untitled Website Translator -->
     <script src="https://elfsightcdn.com/platform.js" async></script>
@@ -693,25 +1004,31 @@
 
     <div id="loader" aria-hidden="true">
         <div class="intro-content">
-            <svg class="intro-monogram" viewBox="0 0 100 100" role="img" aria-label="Alcora">
-                <path class="intro-a-base" d="M 20 84 L 50 16 L 80 84" />
-                <line class="intro-bar-base" x1="32" y1="56" x2="92" y2="56" />
-                <path class="intro-shine" d="M 20 84 L 50 16 L 80 84" />
-                <line class="intro-shine bar" x1="32" y1="56" x2="92" y2="56" />
-            </svg>
+            <div class="intro-seal">
+                <svg class="intro-monogram" viewBox="0 0 100 100" role="img" aria-label="Alcora">
+                    <path class="intro-a-base" d="M 20 84 L 50 16 L 80 84" />
+                    <line class="intro-bar-base" x1="32" y1="56" x2="92" y2="56" />
+                    <path class="intro-shine" d="M 20 84 L 50 16 L 80 84" />
+                    <line class="intro-shine bar" x1="32" y1="56" x2="92" y2="56" />
+                </svg>
+            </div>
             <div class="intro-wordmark">Alcora</div>
+            <div class="intro-rule"></div>
         </div>
     </div>
 
     <div class="page">
         <main>
-            <img class="hero-logo" src="alcora-monogram.png" alt="" width="68" height="68" decoding="async" fetchpriority="high">
-            <div class="eyebrow">The Private Collection</div>
+            <div class="hero-seal">
+                <img class="hero-logo" src="alcora-monogram.png" alt="" width="68" height="68" decoding="async" fetchpriority="high">
+            </div>
+            <div class="eyebrow"><span>The Private Collection</span></div>
             <h1>Curating <em>Exceptional</em><br>New Homes.</h1>
             <p class="description">
                 Architecturally outstanding residences across Dubai, Spain, and the Mediterranean.
             </p>
             <button type="button" class="btn hero-cta" id="open-modal" aria-haspopup="dialog" aria-controls="access-modal">Register Your Interest</button>
+            <div class="cta-note">Private Preview &middot; MMXXVI</div>
         </main>
 
         <footer>
@@ -726,7 +1043,9 @@
 
             <div id="form-panel">
                 <div class="modal-top">
-                    <img class="modal-logo" src="alcora-monogram.png" alt="" width="38" height="38" decoding="async" loading="lazy">
+                    <div class="modal-seal">
+                        <img class="modal-logo" src="alcora-monogram.png" alt="" width="38" height="38" decoding="async" loading="lazy">
+                    </div>
                     <div class="meta-row">
                         <div class="eyebrow">By Invitation Only</div>
                         <div class="ref-code" id="ref-code">REF. 0000</div>
